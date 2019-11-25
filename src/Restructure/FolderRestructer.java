@@ -1,6 +1,7 @@
 package Restructure;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -46,22 +47,45 @@ public class FolderRestructer {
 		
 		try {
 		//Copy operation
+			//if this Is Null Means Its Been Copied by Large Function Files
 		ByteBuffer file_copied_buffer = CopyFile(original_Path,_f);
 		
 		System.out.println(file_copied_buffer.capacity());
 		//Past operation
-				
+		//if file_CopiedBuffer is Null means Thats its a large file and been pasted by an other Function
+				if(file_copied_buffer !=null) {
 					PastFile(file_copied_buffer, _f);
 					System.out.println("File "+FileName+" Copied Succesfully To : "+new_Path);
 					
 					// new File(original_Path).delete();
 					 Is_CopiedSucces = true;
-				
+				}
 		} 
 		catch (IOException e) {e.printStackTrace();}
 		catch(Exception e){e.printStackTrace();}
 		
 		return Is_CopiedSucces;
+	}
+	private ByteBuffer CopyFile(String File_Path_toCopy,File _f) throws IOException {
+		
+		 FileInputStream fis;
+		 //FileChannel fc;
+		 fis= new FileInputStream(File_Path_toCopy);
+		 BufferedInputStream bis = new BufferedInputStream(fis);
+		 if (bis.available()>Constants._250MB_IN_BYTES) {
+			 System.out.println("===> COPIEING A LARGE FILE...");
+			 Copy_and_Past_Large_File(bis,_f);
+			 fis.close();
+			 bis.close();
+			 return null;
+		 };
+		 
+		 byte[] buffer = new byte[bis.available()];
+		 bis.read(buffer);
+		 bis.close();
+		 fis.close();
+
+		 return ByteBuffer.wrap(buffer);
 	}
 	private void PastFile(ByteBuffer File_Copied_Buffer , File _f) throws IOException {
 		FileOutputStream fos;
@@ -72,20 +96,32 @@ public class FolderRestructer {
 		 fc.close();
 		 fos.close();
 	}
-	private ByteBuffer CopyFile(String File_Path_toCopy,File _f) throws IOException {
-		
-		 FileInputStream fis;
-		 //FileChannel fc;
-		 fis= new FileInputStream(File_Path_toCopy);
-		 BufferedInputStream bis = new BufferedInputStream(fis);
+	
+	private void Copy_and_Past_Large_File(BufferedInputStream bis,File File_Distination) throws IOException {
+		byte[] buffer= new byte[Constants._1MB_IN_BYTES];
+		BufferedOutputStream bos=null;
+		FileOutputStream fos =null;
+		try {
+			fos = new FileOutputStream(File_Distination);
+			bos = new BufferedOutputStream(fos);
 			
-		 byte[] buffer = new byte[bis.available()];
-		 bis.read(buffer);
-		 bis.close();
-		 fis.close();
+			int Readable_byte;
+			long time = System.currentTimeMillis();
+			while((Readable_byte=bis.read(buffer))!=-1){
+				//System.out.format("\nbyte Readed = %d\n", Readable_byte);
+				bos.write(buffer);
+				
+				//PastFile(ByteBuffer.wrap(buffer),File_Distination);
+			}
+		} 
+		catch (IOException e) {e.printStackTrace();}
+		finally{
+			if(fos!=null) fos.close();
+			if(bis!=null) bis.close();
+			if(bos!=null) bos.close();
+		}
 
-		 return ByteBuffer.wrap(buffer);
-	}
+}
 	private boolean CopyFile(ExtensionTypes ext,String FileName,String Extension) {
 		switch (ext) {
 		case PDF:
