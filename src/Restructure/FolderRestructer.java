@@ -4,8 +4,10 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.Arrays;
 
 public class FolderRestructer {
@@ -44,17 +46,31 @@ public class FolderRestructer {
 		
 		try {
 		//Copy operation
-			//if this Is Null Means Its Been Copied by Large Function Files
 		ByteBuffer file_copied_buffer = CopyFile(original_Path,_f);
 		
 		System.out.println(file_copied_buffer.capacity());
 		//Past operation
-		
+				
+					PastFile(file_copied_buffer, _f);
+					System.out.println("File "+FileName+" Copied Succesfully To : "+new_Path);
+					
+					// new File(original_Path).delete();
+					 Is_CopiedSucces = true;
+				
 		} 
 		catch (IOException e) {e.printStackTrace();}
 		catch(Exception e){e.printStackTrace();}
 		
 		return Is_CopiedSucces;
+	}
+	private void PastFile(ByteBuffer File_Copied_Buffer , File _f) throws IOException {
+		FileOutputStream fos;
+		FileChannel fc;
+		 fos= new FileOutputStream(_f);
+		 fc = fos.getChannel();
+		 fc.write(File_Copied_Buffer);
+		 fc.close();
+		 fos.close();
 	}
 	private ByteBuffer CopyFile(String File_Path_toCopy,File _f) throws IOException {
 		
@@ -62,7 +78,7 @@ public class FolderRestructer {
 		 //FileChannel fc;
 		 fis= new FileInputStream(File_Path_toCopy);
 		 BufferedInputStream bis = new BufferedInputStream(fis);
-		 
+			
 		 byte[] buffer = new byte[bis.available()];
 		 bis.read(buffer);
 		 bis.close();
