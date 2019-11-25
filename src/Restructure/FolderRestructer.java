@@ -1,7 +1,11 @@
 package Restructure;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class FolderRestructer {
@@ -19,13 +23,87 @@ public class FolderRestructer {
 	public void RestructureDirectory() {
 		Arrays.stream(_File.listFiles()).filter(f->f.isFile()).forEach(x->{		
 			String[]  Extension= Name_and_Extension_Seperator(x.getName());
-			System.out.format("\n%s => %s\n",Extension[1],Extension[0]);
+			//System.out.format("\n%s => %s\n",Extension[1],Extension[0]);
+			
+			CopyFile(GetFileType(Extension[1]),Extension[0] ,Extension[1]);
 		});;
 	}
 	
 	
 	
 	/*==========>Private Functions<==============*/
+	
+	private boolean CopyAndPast(String FileName,String Constant_Path,String ext)  {
+		
+		boolean Is_CopiedSucces = false;
+		String new_Path = String.format("%s\\%s\\%s.%s",_DirectoryPath,Constant_Path,FileName,ext); 
+		String original_Path = String.format("%s\\%s.%s", _DirectoryPath,FileName,ext);
+		File _f = new File(new_Path);
+		
+		if(!_f.getParentFile().exists()) _f.getParentFile().mkdir();
+		
+		try {
+		//Copy operation
+			//if this Is Null Means Its Been Copied by Large Function Files
+		ByteBuffer file_copied_buffer = CopyFile(original_Path,_f);
+		
+		System.out.println(file_copied_buffer.capacity());
+		//Past operation
+		
+		} 
+		catch (IOException e) {e.printStackTrace();}
+		catch(Exception e){e.printStackTrace();}
+		
+		return Is_CopiedSucces;
+	}
+	private ByteBuffer CopyFile(String File_Path_toCopy,File _f) throws IOException {
+		
+		 FileInputStream fis;
+		 //FileChannel fc;
+		 fis= new FileInputStream(File_Path_toCopy);
+		 BufferedInputStream bis = new BufferedInputStream(fis);
+		 
+		 byte[] buffer = new byte[bis.available()];
+		 bis.read(buffer);
+		 bis.close();
+		 fis.close();
+
+		 return ByteBuffer.wrap(buffer);
+	}
+	private boolean CopyFile(ExtensionTypes ext,String FileName,String Extension) {
+		switch (ext) {
+		case PDF:
+			System.out.println("Copying "+FileName+"...");
+			return CopyAndPast(FileName,Constants.PDF_PATH,Extension);
+			
+		case DOCUMENT:
+			System.out.println("Copying "+FileName+"...");
+			return CopyAndPast(FileName,Constants.DOCUMENT_PATH,Extension);
+			
+		case IMAGE:
+			System.out.println("Copying "+FileName+"...");
+			return CopyAndPast(FileName,Constants.IMAGE_PATH,Extension);
+		case PRESENTATION:
+			System.out.println("Copying "+FileName+"...");
+			return CopyAndPast(FileName,Constants.PRESENTATION_PATH,Extension);
+		case ZIP:
+			System.out.println("Copying "+FileName+"...");
+			return CopyAndPast(FileName,Constants.ZIP_PATH,Extension);
+		case VIDEO:
+			System.out.println("Copying "+FileName+"...");
+			return CopyAndPast(FileName,Constants.VIDEO_PATH,Extension);
+		case TORRENT:
+			System.out.println("Copying "+FileName+"...");
+			return CopyAndPast(FileName,Constants.TORRENT_PATH,Extension);
+		case PROGRAMM:
+			System.out.println("Copying "+FileName+"...");
+			return CopyAndPast(FileName,Constants.PROGRAMME_PATH,Extension);
+		default:
+			System.out.println("Copying "+FileName+"...");
+			return CopyAndPast(FileName,Constants.OTHER_PATH,Extension);
+			
+		}
+	}
 	
 	private String[] Name_and_Extension_Seperator(String file) {
 		
@@ -46,5 +124,32 @@ public class FolderRestructer {
 		else if(!_File.isDirectory()) {
 			throw new Exception("The Given Path is Not a Directory");
 		}
+	}
+	private ExtensionTypes GetFileType(String Ext) {
+		  if (Ext.equals("pdf") ) {
+			 return ExtensionTypes.PDF;
+		 }
+		 else if(Ext.equals("jpg") || Ext.equals("png")|| Ext.equals("jpeg") ) {
+			 return ExtensionTypes.IMAGE;
+		 }
+		 else if (Ext.equals("mp4") || Ext.equals("mkv")) {
+			 return ExtensionTypes.VIDEO;
+		 }
+		 else if (Ext.equals("zip") || Ext.equals("rar")) {
+			 return ExtensionTypes.ZIP;
+		 }
+		 else if (Ext.equals("doc") || Ext.equals("docx")|| Ext.equals("txt")) {
+			 return ExtensionTypes.DOCUMENT;
+		 }
+		 else if (Ext.equals("exe") || Ext.equals("msi")) {
+			 return ExtensionTypes.PROGRAMM;
+		 }
+		 else if (Ext.equals("ppt") || Ext.equals("pptx")) {
+			 return ExtensionTypes.PRESENTATION;
+		 }
+		 else if (Ext.equals("torrent")) {
+			 return ExtensionTypes.TORRENT;
+		 }
+		return ExtensionTypes.OTHER;
 	}
 }
