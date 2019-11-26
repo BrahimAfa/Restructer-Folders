@@ -74,7 +74,7 @@ public class FolderRestructer {
 		 BufferedInputStream bis = new BufferedInputStream(fis);
 		 if (bis.available()>Constants._250MB_IN_BYTES) {
 			 System.out.println("===> COPIEING A LARGE FILE...");
-			 Copy_and_Past_Large_File(bis,_f);
+			 Copy_and_Past_Large_File(File_Path_toCopy,_f);
 			 fis.close();
 			 bis.close();
 			 return null;
@@ -97,30 +97,8 @@ public class FolderRestructer {
 		 fos.close();
 	}
 	
-	private void Copy_and_Past_Large_File(BufferedInputStream bis,File File_Distination) throws IOException {
-		byte[] buffer= new byte[Constants._1MB_IN_BYTES];
-		BufferedOutputStream bos=null;
-		FileOutputStream fos =null;
-		try {
-			fos = new FileOutputStream(File_Distination);
-			bos = new BufferedOutputStream(fos);
-			
-			int Readable_byte;
-			long time = System.currentTimeMillis();
-			while((Readable_byte=bis.read(buffer))!=-1){
-				//System.out.format("\nbyte Readed = %d\n", Readable_byte);
-				bos.write(buffer);
-				
-				//PastFile(ByteBuffer.wrap(buffer),File_Distination);
-			}
-		} 
-		catch (IOException e) {e.printStackTrace();}
-		finally{
-			if(fos!=null) fos.close();
-			if(bis!=null) bis.close();
-			if(bos!=null) bos.close();
-		}
-
+	private void Copy_and_Past_Large_File(String File_Path,File File_Distination) throws IOException {
+		new Thread( new LargeFile_Thread(File_Path, File_Distination)).start();
 }
 	private boolean CopyFile(ExtensionTypes ext,String FileName,String Extension) {
 		switch (ext) {
