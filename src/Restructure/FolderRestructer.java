@@ -50,7 +50,7 @@ public class FolderRestructer {
 			//if this Is Null Means Its Been Copied by Large Function Files
 		ByteBuffer file_copied_buffer = CopyFile(original_Path,_f);
 		
-		System.out.println(file_copied_buffer.capacity());
+		//System.out.println(file_copied_buffer.capacity());
 		//Past operation
 		//if file_CopiedBuffer is Null means Thats its a large file and been pasted by an other Function
 				if(file_copied_buffer !=null) {
