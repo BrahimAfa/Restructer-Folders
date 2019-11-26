@@ -1,7 +1,6 @@
 package Restructure;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,17 +26,14 @@ public class FolderRestructer {
 		Arrays.stream(_File.listFiles()).filter(f->f.isFile()).forEach(x->{		
 			String[]  Extension= Name_and_Extension_Seperator(x.getName());
 			//System.out.format("\n%s => %s\n",Extension[1],Extension[0]);
-			
 			CopyFile(GetFileType(Extension[1]),Extension[0] ,Extension[1]);
 		});;
 	}
 	
 	
-	
 	/*==========>Private Functions<==============*/
 	
 	private boolean CopyAndPast(String FileName,String Constant_Path,String ext)  {
-		
 		boolean Is_CopiedSucces = false;
 		String new_Path = String.format("%s\\%s\\%s.%s",_DirectoryPath,Constant_Path,FileName,ext); 
 		String original_Path = String.format("%s\\%s.%s", _DirectoryPath,FileName,ext);
@@ -47,10 +43,9 @@ public class FolderRestructer {
 		
 		try {
 		//Copy operation
-			//if this Is Null Means Its Been Copied by Large Function Files
+		//if this Is Null Means Its Been Copied by Large Function Files
 		ByteBuffer file_copied_buffer = CopyFile(original_Path,_f);
-		
-		//System.out.println(file_copied_buffer.capacity());
+
 		//Past operation
 		//if file_CopiedBuffer is Null means Thats its a large file and been pasted by an other Function
 				if(file_copied_buffer !=null) {
@@ -69,7 +64,6 @@ public class FolderRestructer {
 	private ByteBuffer CopyFile(String File_Path_toCopy,File _f) throws IOException {
 		
 		 FileInputStream fis;
-		 //FileChannel fc;
 		 fis= new FileInputStream(File_Path_toCopy);
 		 BufferedInputStream bis = new BufferedInputStream(fis);
 		 if (bis.available()>Constants._250MB_IN_BYTES) {
@@ -79,7 +73,6 @@ public class FolderRestructer {
 			 bis.close();
 			 return null;
 		 };
-		 
 		 byte[] buffer = new byte[bis.available()];
 		 bis.read(buffer);
 		 bis.close();
@@ -96,60 +89,47 @@ public class FolderRestructer {
 		 fc.close();
 		 fos.close();
 	}
-	
+
 	private void Copy_and_Past_Large_File(String File_Path,File File_Distination) throws IOException {
 		new Thread( new LargeFile_Thread(File_Path, File_Distination)).start();
-}
+	}
 	private boolean CopyFile(ExtensionTypes ext,String FileName,String Extension) {
+
+		System.out.println("Copying "+FileName+"...");
 		switch (ext) {
 		case PDF:
-			System.out.println("Copying "+FileName+"...");
 			return CopyAndPast(FileName,Constants.PDF_PATH,Extension);
 			
 		case DOCUMENT:
-			System.out.println("Copying "+FileName+"...");
 			return CopyAndPast(FileName,Constants.DOCUMENT_PATH,Extension);
 			
 		case IMAGE:
-			System.out.println("Copying "+FileName+"...");
 			return CopyAndPast(FileName,Constants.IMAGE_PATH,Extension);
 		case PRESENTATION:
-			System.out.println("Copying "+FileName+"...");
 			return CopyAndPast(FileName,Constants.PRESENTATION_PATH,Extension);
 		case ZIP:
-			System.out.println("Copying "+FileName+"...");
 			return CopyAndPast(FileName,Constants.ZIP_PATH,Extension);
 		case VIDEO:
-			System.out.println("Copying "+FileName+"...");
 			return CopyAndPast(FileName,Constants.VIDEO_PATH,Extension);
 		case TORRENT:
-			System.out.println("Copying "+FileName+"...");
 			return CopyAndPast(FileName,Constants.TORRENT_PATH,Extension);
 		case PROGRAMM:
-			System.out.println("Copying "+FileName+"...");
 			return CopyAndPast(FileName,Constants.PROGRAMME_PATH,Extension);
 		default:
-			System.out.println("Copying "+FileName+"...");
 			return CopyAndPast(FileName,Constants.OTHER_PATH,Extension);
-			
 		}
 	}
 	
 	private String[] Name_and_Extension_Seperator(String file) {
-		
 		int Point_Last_Index = file.lastIndexOf(".");
-		
 		String FileExtension = file.substring(Point_Last_Index+1,file.length());
 		String FileName = file.substring(0,Point_Last_Index);
-
-		
 		return new String[] {FileName,FileExtension};
 	}
 	
 	private void Check_Is_Directory_And_Valid_Path() throws Exception  {
 		if(!_File.exists()) {
 			throw new FileNotFoundException("File Not Found!!! Check the if The Path is Valid");
-			
 		}
 		else if(!_File.isDirectory()) {
 			throw new Exception("The Given Path is Not a Directory");
